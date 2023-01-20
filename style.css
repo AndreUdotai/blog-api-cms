@@ -1,0 +1,76 @@
+/* ***********************************************/
+/* HEADER STYLES */
+/* ***********************************************/
+
+#navbar-header {
+    background-color:rgb(6, 8, 23);
+    color: whitesmoke;
+    border-bottom: 1px solid rgb(14, 23, 28);
+}
+
+#navbar-header span {
+    color: whitesmoke;
+}
+
+/* ***********************************************/
+/* BREADCRUMB STYLES */
+/* ***********************************************/
+
+#navbar-breadcrumb {
+    background-color: rgb(17, 18, 29);
+    color: rgb(126, 132, 156);
+}
+
+a#breadcrumb-items, li#breadcrumb-items {
+    color: rgb(126, 132, 156);
+}
+
+/* ***********************************************/
+/* SIDE BAR STYLING */
+/* ***********************************************/
+
+
+#main {
+    background-color: rgb(6, 8, 23);
+    color: rgb(81, 103, 143);
+    display: flex;
+    height: 100vh;
+}
+
+#side-bar {
+    border-right: solid 1px rgb(14, 23, 28);
+}
+
+#sidebar li:hover {
+    background-color: rgb(57, 72, 86);
+    color: whitesmoke;
+}
+
+.collapsed-list-items {
+    margin-left: 40px;
+}
+
+/* ***********************************************/
+/* DISPLAY STYLES */
+/* ***********************************************/
+
+/* DASHBOARD ITEMS STYLES */
+
+.dashboard-items {
+    background-color:  rgb(10, 16, 25);
+    color: whitesmoke;
+}
+
+/* POST LIST STYLES */
+
+#publish-button {
+    background-color: rgb(6, 8, 23);
+    border: red 1px solid;
+    color: red;
+}
+
+#post-list, #user-list, #new-user, #new-post {
+    background-color:rgb(10, 16, 25);
+    color: whitesmoke;
+}
+
