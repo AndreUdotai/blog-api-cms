@@ -63,12 +63,6 @@ a#breadcrumb-items, li#breadcrumb-items {
 
 /* POST LIST STYLES */
 
-#publish-button {
-    background-color: rgb(6, 8, 23);
-    border: red 1px solid;
-    color: red;
-}
-
 #post-list, #user-list, #new-user, #new-post {
     background-color:rgb(10, 16, 25);
     color: whitesmoke;
