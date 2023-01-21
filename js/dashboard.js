@@ -1,5 +1,4 @@
-
-async function getData(url){
+async function getData(url) {
     const response = await fetch(url, {
         mode: 'cors',
         method: 'GET',
@@ -31,12 +30,11 @@ let dashboardDisplay = () => {
     // Set the display innerHTML to the loader animation
     display.innerHTML = loaderElement;
 
-    getData('http://localhost:3000/api/dashboard')
-        .then((data) => {
-            let username = document.getElementById('username');
-            username.innerText = data.authData.user.username;
-            // Create the dashboard count component
-            let dashboardComponent = `<div class="row p-3 m-5 rounded text-left" id="dashboard-display">
+    getData('http://localhost:3000/api/dashboard').then((data) => {
+        let username = document.getElementById('username');
+        username.innerText = data.authData.user.username;
+        // Create the dashboard count component
+        let dashboardComponent = `<div class="row p-3 m-5 rounded text-left" id="dashboard-display">
                                         <div class="col m-1 dashboard-items rounded p-5">
                                             <div class="h1" id="post-count">${data.results.post_count}</div>
                                             <div class="number-description">Total Posts</div>
@@ -50,20 +48,17 @@ let dashboardDisplay = () => {
                                             <div class="number-description">Total Comments</div>
                                         </div>
                                     </div>`;
-            // Set the innerHTML of the display element to show the dashbaordComponent
-            display.innerHTML = dashboardComponent;
-        });
+        // Set the innerHTML of the display element to show the dashbaordComponent
+        display.innerHTML = dashboardComponent;
+    });
 };
 // Invoke the dashboardDisplay function on page load
 dashboardDisplay();
-
-
 
 let fetchPosts = () => {
     getData('http://localhost:3000/api/posts')
         // .then((response) => response.json())
         .then((data) => {
-            console.log(data.posts)
             // Select the username element and set it to the username from the authData
             let username = document.getElementById('username');
             username.innerText = data.authData.user.username;
@@ -81,6 +76,7 @@ let fetchPosts = () => {
 
             // Loop over posts array
             for (let post of data.posts) {
+                // Create a div to hold the looped data
                 let postCapsule = document.createElement('div');
 
                 // Set published status button display according to its value
@@ -140,7 +136,7 @@ let updatePublishedStatus = (id, status) => {
                 'Content-Type': 'application/json',
             },
         },
-    )
+    );
 };
 
 // *******************************************************************************
@@ -183,4 +179,55 @@ display.addEventListener('click', (e) => {
             updatePublishedStatus(e.target.dataset.id, 'true');
         }
     }
+});
+
+// *******************************************************************************
+// WHEN USERS LIST BUTTON IS CLICKED
+// *******************************************************************************
+
+// Select the posts list element from the DOM
+let usersList = document.getElementById('users-list');
+usersList.addEventListener('click', () => {
+    getData('http://localhost:3000/api/users')
+        // .then((response) => response.json())
+        .then((data) => {
+            // Select the username element and set it to the username from the authData
+            let username = document.getElementById('username');
+            username.innerText = data.authData.user.username;
+
+            // Create a new Ul element that will contain the users list
+            let usersListContainer = document.createElement('ul');
+            usersListContainer.classList.add(
+                'row',
+                'p-3',
+                'm-5',
+                'rounded',
+                'text-left',
+            );
+            usersListContainer.setAttribute('id', 'post-list');
+
+            // Loop over users array
+            for (let user of data.users) {
+                // Create a div to hold the looped data
+                let userCapsule = document.createElement('div');
+
+                // Create the users list HTML component
+                let usersListComponent =    `<li class="row align-items-center my-2">
+                                                <p class="col rounded">${user.username}</p>
+                                                <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
+                                                    <button type="button" class="btn btn-primary">Edit</button>
+                                                </div>
+                                            </li>
+                                            <hr>`;
+                
+                // Embed the usersListComponent inside user capsule element
+                userCapsule.innerHTML = usersListComponent;
+                // Append user capsule on users list container for each iteration
+                usersListContainer.appendChild(userCapsule);
+            }
+            let display = document.getElementById('display');
+            // Set the user list container as the only child of display node
+            display.innerHTML = '';
+            display.appendChild(usersListContainer);
+        });
 });
