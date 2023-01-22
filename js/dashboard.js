@@ -65,14 +65,14 @@ let generateLoadingComponent = () => {
 let generateNewPostComponent = () => {
     return `<form class="col-10 mx-auto mt-2 p-4 rounded" id="new-post">
                 <div class="mb-3">
-                    <label for="post-title" class="form-label">Title</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="title" aria-describedby="emailHelp">
                 </div>
                 <div class="mb-3">
-                    <label for="post-content" class="form-label">Post</label>
-                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+                    <label for="content" class="form-label">Post</label>
+                    <textarea class="form-control" id="content" rows="15"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-primary" data-post="submit">Submit</button>
             </form>`;
 };
 
@@ -82,7 +82,7 @@ let generateNewPostComponent = () => {
 // *******************************************************************************
 
 // General fetch function to call fetch() taking the url and the fetch method as arguments
-async function getData(url, method) {
+async function getData(url, method, data) {
     const response = await fetch(url, {
         mode: 'cors',
         method: method,
@@ -96,6 +96,9 @@ async function getData(url, method) {
                 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjYzYjc3NmJmYTQ3ZTliMjZlOWYzM2U1OSIsInVzZXJuYW1lIjoibWFjbWlsbGVyIiwicGFzc3dvcmQiOiIkMmEkMTAkNnBMaU04UmxFaFdmdzUwZGFTS3l4dUtFQzNENnY3Y252Yi9tbmlZMENCd21aWldFb1p4NS4iLCJfX3YiOjB9LCJpYXQiOjE2NzMyOTYwNzZ9.mKcfDLi7i9ULynoVRCI3pJaM6nbr4mm74dIYdFks5pQ',
             'Content-Type': 'application/json',
         },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify(data),
     });
     return response.json(); // parses JSON response into native JavaScript objects
 }
@@ -177,7 +180,7 @@ let fetchPosts = () => {
 
 // The fetch Users function to retrieve all the users from the DB
 let fetchUsers = () => {
-    getData('http://localhost:3000/api/users')
+    getData('http://localhost:3000/api/users', 'GET')
         // .then((response) => response.json())
         .then((data) => {
             // Display the username of the logged in User
@@ -236,6 +239,36 @@ let displayNewPostForm = () => {
     display.appendChild(newPostContainer);
 };
 
+// Submit blog post function
+let submitBlogPost = () => {
+    // Selet the input fields
+    let title   = document.getElementById('title');
+    let content = document.getElementById('content');
+
+    // Initializing a post object from entered data by the admin
+    let blogPostData = {
+        title: title.value,
+        post: content.value,
+    };
+
+    // Clear post form after submission
+    title.value     = '';
+    content.value   = '';
+
+    // Call the getData function to initiate a post request to send the new blog post
+    let url = "http://localhost:3000/api/post/create";
+    getData(url, 'POST', blogPostData)
+        .then((data) => {
+            if(data.errors){
+                title.value     = `${data.post.title}`;
+                content.value   = `${data.post.post}`;
+            } else {
+                // Call the fetchPosts function to display all the posts
+                fetchPosts();
+            }
+        })
+};
+
 // *******************************************************************************
 // CLICK EVENT LISTENERS
 // *******************************************************************************
@@ -281,3 +314,9 @@ newPost.addEventListener('click', () => displayNewPostForm());
 
 // WHEN THE POST SUBMIT BUTTON IS CLICKED
 // Select and add a click event listern on the post submit button
+let displayNode = document.getElementById('display');
+displayNode.addEventListener('click', (e) => {
+    if (e.target.dataset.post) {
+        submitBlogPost();
+    }
+})
