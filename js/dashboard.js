@@ -223,6 +223,7 @@ let updatePublishedStatus = (id, status) => {
         'http://localhost:3000/api/post/' + id + '/published/update/' + status;
     // Call the getData function to initiate a post request to update the post of 'id' with a new 'status'
     getData(url, 'POST');
+    fetchPosts();
 };
 
 // The display new post form function
@@ -289,14 +290,12 @@ let display = document.getElementById('display');
 display.addEventListener('click', (e) => {
     // Set a condition to target a child node with the data-id attribute (only published button has this attribute)
     if (e.target.hasAttribute('data-id')) {
+        console.log(e.target.innerText)
         // Set a condition to check innerText value, that is, the buttons name
         if (e.target.dataset.value === 'Published') {
-            // Toggle the name on the published status button
-            e.target.innerText = 'Unpublished';
             // Call the updatePublished function with supplied arguments
             updatePublishedStatus(e.target.dataset.id, 'false');
         } else {
-            e.target.innerText = 'Published';
             updatePublishedStatus(e.target.dataset.id, 'true');
         }
     }
