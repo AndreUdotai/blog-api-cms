@@ -12,15 +12,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.tiny.cloud/1/qevpz3r412wubm3vqrendqxhb2e2cqvks7rtjgejof1smbhc/tinymce/6/tinymce.min.js"
+        referrerpolicy="origin"></script> -->
 </head>
 
 <body>
     <nav class="navbar" id="navbar-header">
         <div class="container-fluid">
             <h1>Andre's Blog</h1>
-            <span class="navbar-text" id="username">
-                andreudotai
-            </span>
+            <span class="navbar-text" id="username"></span>
         </div>
     </nav>
 
@@ -50,7 +50,7 @@
                 </li>
                 <ul class="collapse collapsed-list-items" id="posts">
                     <li class=" py-2 m-1 rounded px-2" role="button" id="post-list">Post List</li>
-                    <li class=" py-2 m-1 rounded px-2" role="button">New Post</li>
+                    <li class=" py-2 m-1 rounded px-2" role="button" id="new-post">New Post</li>
                 </ul>
                 <li data-bs-toggle="collapse" href="#users" role="button" aria-expanded="false"
                     aria-controls="collapseExample" class="sidebar-dropdown px-5 py-3 m-1 rounded">
@@ -65,6 +65,19 @@
         
         <div id="display" class="container"></div>
     </div>
+    <!-- <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' },
+            ]
+        });
+    </script> -->
     <script src="./js/dashboard.js"></script>
 </body>
 

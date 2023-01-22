@@ -3,7 +3,7 @@
 // *******************************************************************************
 // Function to generate USERS LIST COMPONENT
 let generateUsersListComponent = (username) => {
-    return  `<li class="row align-items-center my-2">
+    return `<li class="row align-items-center my-2">
                 <p class="col rounded">${username}</p>
                 <div class="col d-grid gap-2 d-md-flex justify-content-md-end">
                     <button type="button" class="btn btn-primary">Edit</button>
@@ -61,6 +61,22 @@ let generateLoadingComponent = () => {
             </div>`;
 };
 
+// Function to generate the NEW POST FORM COMPONENT
+let generateNewPostComponent = () => {
+    return `<form class="col-10 mx-auto mt-2 p-4 rounded" id="new-post">
+                <div class="mb-3">
+                    <label for="post-title" class="form-label">Title</label>
+                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                    <label for="post-content" class="form-label">Post</label>
+                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="15"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>`;
+};
+
+
 // *******************************************************************************
 // FETCH FUNCTIONS
 // *******************************************************************************
@@ -96,9 +112,13 @@ let fetchCounts = () => {
     getData('http://localhost:3000/api/dashboard', 'GET').then((data) => {
         // Display the username of the logged in User
         displayUsername(data.authData.user.username);
-        
+
         // Embed the dashboardComponent inside display node
-        display.innerHTML = generateDashboardComponent(data.results.post_count, data.results.user_count, data.results.comment_count);
+        display.innerHTML = generateDashboardComponent(
+            data.results.post_count,
+            data.results.user_count,
+            data.results.comment_count,
+        );
     });
 };
 // Invoke the dashboardDisplay function on page load
@@ -107,8 +127,8 @@ fetchCounts();
 // Display the username of the logged in user
 let displayUsername = (username) => {
     let usernameDisplay = document.getElementById('username');
-    return usernameDisplay.innerText = username;
-}
+    return (usernameDisplay.innerText = username);
+};
 
 // the fetchPosts function to retrieve all the posts from the DB
 let fetchPosts = () => {
@@ -135,10 +155,16 @@ let fetchPosts = () => {
                 let postCapsule = document.createElement('div');
 
                 // Set published status button display according to its value
-                let publishStatus = post.published ? 'Published' : 'Unpublished';
+                let publishStatus = post.published
+                    ? 'Published'
+                    : 'Unpublished';
 
                 // Embed the postListComponent inside post capsule element
-                postCapsule.innerHTML = generatePostListComponent(post.title, post._id, publishStatus);
+                postCapsule.innerHTML = generatePostListComponent(
+                    post.title,
+                    post._id,
+                    publishStatus,
+                );
                 // Append post capsule on post list container for each iteration
                 postListContainer.appendChild(postCapsule);
             }
@@ -174,7 +200,9 @@ let fetchUsers = () => {
                 let userCapsule = document.createElement('div');
 
                 // Embed the usersListComponent inside user capsule element
-                userCapsule.innerHTML = generateUsersListComponent(user.username);
+                userCapsule.innerHTML = generateUsersListComponent(
+                    user.username,
+                );
                 // Append user capsule on users list container for each iteration
                 usersListContainer.appendChild(userCapsule);
             }
@@ -183,14 +211,29 @@ let fetchUsers = () => {
             display.innerHTML = '';
             display.appendChild(usersListContainer);
         });
-}
+};
 
 // The post published status toggle function
 // Takes the post id and the status to be changed to as arguments
 let updatePublishedStatus = (id, status) => {
-    let url = 'http://localhost:3000/api/post/' + id + '/published/update/' + status
+    let url =
+        'http://localhost:3000/api/post/' + id + '/published/update/' + status;
     // Call the getData function to initiate a post request to update the post of 'id' with a new 'status'
     getData(url, 'POST');
+};
+
+// The display new post form function
+let displayNewPostForm = () => {
+    // Create a new div element that will contain the new post form
+    let newPostContainer = document.createElement('div');
+    newPostContainer.classList.add(
+        'row',
+        'p-3',
+    );
+    // postListContainer.setAttribute('id', 'post-list');
+    newPostContainer.innerHTML = generateNewPostComponent();
+    display.innerHTML = '';
+    display.appendChild(newPostContainer);
 };
 
 // *******************************************************************************
@@ -230,3 +273,11 @@ display.addEventListener('click', (e) => {
 // Select and add a click event listener on the users list button to display users
 let usersList = document.getElementById('users-list');
 usersList.addEventListener('click', () => fetchUsers());
+
+// WHEN NEW POST BUTTON IS CLICKED
+// Select and add a click event listener on the new post button to display the post form
+let newPost = document.getElementById('new-post');
+newPost.addEventListener('click', () => displayNewPostForm());
+
+// WHEN THE POST SUBMIT BUTTON IS CLICKED
+// Select and add a click event listern on the post submit button
