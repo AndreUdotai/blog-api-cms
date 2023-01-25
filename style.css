@@ -34,7 +34,7 @@ a#breadcrumb-items, li#breadcrumb-items {
     background-color: rgb(6, 8, 23);
     color: rgb(81, 103, 143);
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
 }
 
 #side-bar {
