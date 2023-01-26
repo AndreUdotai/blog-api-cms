@@ -44,7 +44,7 @@ let generatePostListComponent = (title, id, publishStatus) => {
                     >
                         ${publishStatus}
                     </button>
-                    <button type='button' class='btn btn-primary'>
+                    <button type='button' class='btn btn-primary' data-edit='${id}'>
                         Edit
                     </button>
                 </div>
@@ -62,7 +62,7 @@ let generateLoadingComponent = () => {
 };
 
 // Function to generate the NEW POST FORM COMPONENT
-let generateNewPostComponent = () => {
+let generateNewPostComponent = (id) => {
     return `<form class="col-10 mx-auto mt-2 p-4 rounded" id="new-post">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
@@ -72,10 +72,10 @@ let generateNewPostComponent = () => {
                     <label for="content" class="form-label">Post</label>
                     <textarea class="form-control" id="content" rows="15"></textarea>
                 </div>
-                <button type="button" class="btn btn-primary" data-post="submit">Submit</button>
+                <button type="button" class="btn btn-primary" id="submitPost" data-post="submit">Submit</button>
+                <button type="button" class="btn btn-primary" id="updatePost" data-postid="${id}" data-update="update">Update</button>
             </form>`;
 };
-
 
 // *******************************************************************************
 // FETCH FUNCTIONS
@@ -180,40 +180,64 @@ let fetchPosts = () => {
 
 // The fetch Users function to retrieve all the users from the DB
 let fetchUsers = () => {
-    getData('http://localhost:3000/api/users', 'GET')
-        // .then((response) => response.json())
-        .then((data) => {
-            // Display the username of the logged in User
-            displayUsername(data.authData.user.username);
+    getData('http://localhost:3000/api/users', 'GET').then((data) => {
+        // Display the username of the logged in User
+        displayUsername(data.authData.user.username);
 
-            // Create a new Ul element that will contain the users list
-            let usersListContainer = document.createElement('ul');
-            usersListContainer.classList.add(
-                'row',
-                'p-3',
-                'm-5',
-                'rounded',
-                'text-left',
-            );
-            usersListContainer.setAttribute('id', 'post-list');
+        // Create a new Ul element that will contain the users list
+        let usersListContainer = document.createElement('ul');
+        usersListContainer.classList.add(
+            'row',
+            'p-3',
+            'm-5',
+            'rounded',
+            'text-left',
+        );
+        usersListContainer.setAttribute('id', 'post-list');
 
-            // Loop over users array
-            for (let user of data.users) {
-                // Create a div to hold the looped data
-                let userCapsule = document.createElement('div');
+        // Loop over users array
+        for (let user of data.users) {
+            // Create a div to hold the looped data
+            let userCapsule = document.createElement('div');
 
-                // Embed the usersListComponent inside user capsule element
-                userCapsule.innerHTML = generateUsersListComponent(
-                    user.username,
-                );
-                // Append user capsule on users list container for each iteration
-                usersListContainer.appendChild(userCapsule);
-            }
-            let display = document.getElementById('display');
-            // Set the user list container as the only child of display node
-            display.innerHTML = '';
-            display.appendChild(usersListContainer);
-        });
+            // Embed the usersListComponent inside user capsule element
+            userCapsule.innerHTML = generateUsersListComponent(user.username);
+            // Append user capsule on users list container for each iteration
+            usersListContainer.appendChild(userCapsule);
+        }
+        let display = document.getElementById('display');
+        // Set the user list container as the only child of display node
+        display.innerHTML = '';
+        display.appendChild(usersListContainer);
+    });
+};
+
+// The fetch Blog Post function to retrieve a single blog post with a provided ID from the DB
+let fetchBlogPost = (postID) => {
+    // Call the getData function to initiate a get request to retrieve the details of the post
+    let url = 'http://localhost:3000/api/post/' + postID + '/update';
+    getData(url, 'GET').then((data) => {
+        // Create a new div element that will contain the edit post form
+        let editPostContainer = document.createElement('div');
+        editPostContainer.classList.add('row', 'p-3');
+        // Set the innerHTML of the new div to be the new post component
+        // Edit post form will re-use the new post component
+        editPostContainer.innerHTML = generateNewPostComponent();
+        display.innerHTML = '';
+        display.appendChild(editPostContainer);
+        // Insert the values of the title and content of the retrieved post from the returned data from the API call
+        // Note: these variables are created from the ids in the new post component
+        let postTitle = document.getElementById('title');
+        let postContent = document.getElementById('content');
+
+        postTitle.value = data.post.title;
+        postContent.value = data.post.post;
+        // Select the submit post button and hide it
+        let submitPostButton = document.getElementById('submitPost');
+        submitPostButton.style.display = 'none';
+        let updatePostButton = document.getElementById('updatePost');
+        updatePostButton.dataset.postid = data.post._id;
+    });
 };
 
 // The post published status toggle function
@@ -230,20 +254,19 @@ let updatePublishedStatus = (id, status) => {
 let displayNewPostForm = () => {
     // Create a new div element that will contain the new post form
     let newPostContainer = document.createElement('div');
-    newPostContainer.classList.add(
-        'row',
-        'p-3',
-    );
-    // postListContainer.setAttribute('id', 'post-list');
+    newPostContainer.classList.add('row', 'p-3');
     newPostContainer.innerHTML = generateNewPostComponent();
     display.innerHTML = '';
     display.appendChild(newPostContainer);
+    // Select the update post button and hide it
+    let updatePostButton = document.getElementById('updatePost');
+    updatePostButton.style.display = 'none';
 };
 
 // Submit blog post function
 let submitBlogPost = () => {
     // Selet the input fields
-    let title   = document.getElementById('title');
+    let title = document.getElementById('title');
     let content = document.getElementById('content');
 
     // Initializing a post object from entered data by the admin
@@ -253,21 +276,50 @@ let submitBlogPost = () => {
     };
 
     // Clear post form after submission
-    title.value     = '';
-    content.value   = '';
+    title.value = '';
+    content.value = '';
 
     // Call the getData function to initiate a post request to send the new blog post
-    let url = "http://localhost:3000/api/post/create";
-    getData(url, 'POST', blogPostData)
-        .then((data) => {
-            if(data.errors){
-                title.value     = `${data.post.title}`;
-                content.value   = `${data.post.post}`;
-            } else {
-                // Call the fetchPosts function to display all the posts
-                fetchPosts();
-            }
-        })
+    let url = 'http://localhost:3000/api/post/create';
+    getData(url, 'POST', blogPostData).then((data) => {
+        if (data.errors) {
+            title.value = `${data.post.title}`;
+            content.value = `${data.post.post}`;
+        } else {
+            // Call the fetchPosts function to display all the posts
+            fetchPosts();
+        }
+    });
+};
+
+// Update blog post function
+let updateBlogPost = (postID) => {
+    // Selet the input fields
+    let title = document.getElementById('title');
+    let content = document.getElementById('content');
+
+        // Initializing a post object from entered data by the admin
+        let blogPostData = {
+            title: title.value,
+            post: content.value,
+        };
+
+        // Clear post form after submission
+        title.value = '';
+        content.value = '';
+
+    // Call the getData function to initiate a post request to update the blog post
+    let url = 'http://localhost:3000/api/post/' + postID + '/update'; 
+    getData(url, 'POST', blogPostData).then((data) => {
+        if (data.errors) {
+            title.value = `${data.post.title}`;
+            content.value = `${data.post.post}`;
+        } else {
+            // Call the fetchPosts function to display all the posts
+            fetchPosts();
+            // console.log(data);
+        }
+    });
 };
 
 // *******************************************************************************
@@ -290,7 +342,7 @@ let display = document.getElementById('display');
 display.addEventListener('click', (e) => {
     // Set a condition to target a child node with the data-id attribute (only published button has this attribute)
     if (e.target.hasAttribute('data-id')) {
-        console.log(e.target.innerText)
+        console.log(e.target.innerText);
         // Set a condition to check innerText value, that is, the buttons name
         if (e.target.dataset.value === 'Published') {
             // Call the updatePublished function with supplied arguments
@@ -311,11 +363,32 @@ usersList.addEventListener('click', () => fetchUsers());
 let newPost = document.getElementById('new-post');
 newPost.addEventListener('click', () => displayNewPostForm());
 
+// SELECT THE DISPLAY ELEMENT FOR EVERY CLICK LISTENER ON GENERATED DOM ELEMENT BUTTONS
+let displayNode = document.getElementById('display');
+
 // WHEN THE POST SUBMIT BUTTON IS CLICKED
 // Select and add a click event listern on the post submit button
-let displayNode = document.getElementById('display');
+// Only the post submit button has a dataset value of post
 displayNode.addEventListener('click', (e) => {
     if (e.target.dataset.post) {
         submitBlogPost();
     }
-})
+});
+
+// WHEN THE POST EDIT BUTTON IS CLICKED
+// Display the edit form with the title and post
+// Only the edit button has a dataset value of edi
+displayNode.addEventListener('click', (e) => {
+    if (e.target.dataset.edit) {
+        fetchBlogPost(e.target.dataset.edit);
+    }
+});
+
+// WHEN THE POST UPDATE BUTTON IS CLICKED
+// Select and add a click event listener on the update button to upate the post
+// Only the update button as a dataset value of postid
+displayNode.addEventListener('click', (e) => {
+    if (e.target.dataset.postid) {
+        updateBlogPost(e.target.dataset.postid);
+    }
+});
