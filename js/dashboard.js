@@ -317,7 +317,6 @@ let updateBlogPost = (postID) => {
         } else {
             // Call the fetchPosts function to display all the posts
             fetchPosts();
-            // console.log(data);
         }
     });
 };
@@ -342,7 +341,6 @@ let display = document.getElementById('display');
 display.addEventListener('click', (e) => {
     // Set a condition to target a child node with the data-id attribute (only published button has this attribute)
     if (e.target.hasAttribute('data-id')) {
-        console.log(e.target.innerText);
         // Set a condition to check innerText value, that is, the buttons name
         if (e.target.dataset.value === 'Published') {
             // Call the updatePublished function with supplied arguments
